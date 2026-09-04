@@ -20,7 +20,6 @@ while :; do
     "$SCRIPT_DIR/pick.sh" >/dev/null 2>&1 || true
     # A timeout keeps the selected time slot current while the device is awake.
     # During deep sleep this process is frozen and consumes no CPU.
-    lipc-wait-event -s 60 com.lab126.powerd \
+    lipc-wait-event -s 15 com.lab126.powerd \
         goingToScreenSaver,outOfScreenSaver >/dev/null 2>&1 || true
 done
-

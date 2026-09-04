@@ -20,7 +20,7 @@ read_mode() {
     if [ -f "$CONFIG_FILE" ]; then
         configured=$(sed -n 's/^mode=//p' "$CONFIG_FILE" | head -n 1)
         case "$configured" in
-            hourly|daily) mode="$configured" ;;
+        minute|hourly|daily) mode="$configured" ;;
         esac
     fi
     printf '%s\n' "$mode"

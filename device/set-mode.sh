@@ -5,8 +5,8 @@ SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 . "$SCRIPT_DIR/common.sh"
 
 case "${1:-}" in
-    hourly|daily) mode="$1" ;;
-    *) echo "Usage: $0 hourly|daily" >&2; exit 2 ;;
+    minute|hourly|daily) mode="$1" ;;
+    *) echo "Usage: $0 minute|hourly|daily" >&2; exit 2 ;;
 esac
 
 mkdir -p "$(dirname "$CONFIG_FILE")"

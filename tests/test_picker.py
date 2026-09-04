@@ -58,6 +58,23 @@ class PickerTests(unittest.TestCase):
         self.assertEqual((self.linkss / "bg_ss00.png").read_bytes(), b"C")
         self.assertEqual((pathlib.Path(self.temp.name) / "config").read_text(), "mode=hourly\n")
 
+    def test_minute_rotation(self) -> None:
+        self.add_photos()
+        result = self.run_script(SET_MODE, "minute", epoch=60 * 7)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual((self.linkss / "bg_ss00.png").read_bytes(), b"B")
+        self.assertEqual((self.state / "mode").read_text(), "minute\n")
+
+    def test_same_slot_does_not_rewrite_active_image(self) -> None:
+        self.add_photos()
+        first = self.run_script(SET_MODE, "minute", epoch=60 * 7)
+        self.assertEqual(first.returncode, 0, first.stderr)
+        active = self.linkss / "bg_ss00.png"
+        first_mtime = active.stat().st_mtime_ns
+        second = self.run_script(PICKER, epoch=60 * 7 + 30)
+        self.assertEqual(second.returncode, 0, second.stderr)
+        self.assertEqual(active.stat().st_mtime_ns, first_mtime)
+
     def test_empty_library_is_non_destructive(self) -> None:
         active = self.linkss / "bg_ss00.png"
         active.write_bytes(b"ORIGINAL")
@@ -72,4 +89,3 @@ class PickerTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

@@ -54,10 +54,30 @@ def deploy(host: str) -> None:
     )
 
 
-def push(host: str, photos: list[pathlib.Path]) -> None:
-    missing = [str(photo) for photo in photos if not photo.is_file()]
+SUPPORTED_SUFFIXES = {".jpg", ".jpeg", ".png"}
+
+
+def collect_photos(inputs: list[pathlib.Path]) -> list[pathlib.Path]:
+    photos: list[pathlib.Path] = []
+    for item in inputs:
+        if item.is_dir():
+            photos.extend(
+                child
+                for child in sorted(item.rglob("*"))
+                if child.is_file() and child.suffix.lower() in SUPPORTED_SUFFIXES
+            )
+        elif item.is_file() and item.suffix.lower() in SUPPORTED_SUFFIXES:
+            photos.append(item)
+    return photos
+
+
+def push(host: str, inputs: list[pathlib.Path]) -> None:
+    missing = [str(item) for item in inputs if not item.exists()]
     if missing:
         raise SystemExit("Missing photo(s): " + ", ".join(missing))
+    photos = collect_photos(inputs)
+    if not photos:
+        raise SystemExit("No JPEG or PNG photos found")
     ssh(host, f"mkdir -p {REMOTE_ROOT}/inbox")
     commands = [
         f"put {shlex.quote(str(photo.resolve()))} "
@@ -80,7 +100,7 @@ def build_parser() -> argparse.ArgumentParser:
         child.add_argument("--host", required=True, help="SSH target, e.g. root@192.168.1.12")
     child = subparsers.add_parser("push")
     child.add_argument("--host", required=True)
-    child.add_argument("photos", nargs="+", type=pathlib.Path)
+    child.add_argument("photos", nargs="+", type=pathlib.Path, help="photo files or directories")
     return parser
 
 
@@ -97,4 +117,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-

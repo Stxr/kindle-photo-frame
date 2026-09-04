@@ -12,7 +12,7 @@ E Ink keeps the displayed image without a foreground app continuously running.
 
 - local JPEG/PNG photo inbox;
 - center-crop and grayscale conversion on the Kindle;
-- deterministic hourly or daily rotation;
+- deterministic minute (test), hourly, or daily rotation;
 - atomic replacement of the `linkss` screensaver;
 - SFTP deployment from a computer;
 - backup and uninstall path for the pre-existing screensaver set;
@@ -27,10 +27,11 @@ Deploy the extension and one or more photos while the Kindle is awake:
 ```sh
 python3 host/photo_frame.py deploy --host root@KINDLE_IP
 python3 host/photo_frame.py push --host root@KINDLE_IP photo1.jpg photo2.png
+python3 host/photo_frame.py push --host root@KINDLE_IP /path/to/a/photo-folder
 ```
 
 On the Kindle, open KUAL → **Photo Frame** → **Install / repair**, then choose
-hourly or daily mode. The current image is selected immediately. Subsequent
+minute, hourly, or daily mode. The current image is selected immediately. Subsequent
 photo imports refresh it automatically.
 
 Installation adds a clearly marked autostart stanza to the existing user-storage
@@ -46,11 +47,24 @@ The device paths are:
 
 ## Power behavior
 
-Hourly/daily means that the image selected at lock time corresponds to the
+Minute/hourly/daily means that the image selected at lock time corresponds to the
 current time slot. Normal Kindle deep sleep does not promise execution of cron
 jobs or networking while asleep. Strictly changing the already-visible image
 at every wall-clock boundary would require a timed wake-up and costs more
 battery; that is deliberately outside this first version.
+
+The minute mode is intended for validation. While the Kindle is awake, the
+watcher updates the prepared lock-screen file within roughly 15 seconds of a
+minute boundary. To see each change with normal low-power behavior, wake and
+lock the Kindle again; deep sleep itself does not run a reliable per-minute job.
+
+## Batch photo preparation
+
+`host/photo_frame.py push` accepts any number of files and directories. It
+recursively uploads JPEG/PNG files, then runs `device/import.sh` once on the
+Kindle. Each new image is auto-oriented, center-cropped without stretching,
+converted to grayscale, resized to 1072×1448, stripped of metadata, and saved
+as PNG8. Previously converted files are reused by checksum.
 
 ## Development
 
