@@ -6,6 +6,7 @@
     <author>txr</author>
     <id>photo-frame</id>
   </information>
-  <menus />
+  <menus>
+    <menu type="json" dynamic="true">menu.json</menu>
+  </menus>
 </extension>
-
