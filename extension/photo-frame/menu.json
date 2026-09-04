@@ -7,19 +7,27 @@
         {"name": "Install / repair", "action": "./bin/run.sh", "params": "install", "exitmenu": false, "refresh": true},
         {"name": "Import photos now", "action": "./bin/run.sh", "params": "import", "exitmenu": false, "refresh": true},
         {"name": "Refresh current photo", "action": "./bin/run.sh", "params": "pick", "exitmenu": false, "refresh": true},
-        {"name": "Use minute rotation (test)", "action": "./bin/run.sh", "params": "minute", "exitmenu": false, "refresh": true},
+        {"name": "✓ Use minute rotation (test)", "if": "\"/mnt/us/photo-frame/config\" \"^mode=minute$\" -gg", "priority": 10, "action": "./bin/run.sh", "params": "minute", "exitmenu": false, "refresh": true},
+        {"name": "Use minute rotation (test)", "if": "\"/mnt/us/photo-frame/config\" \"^mode=minute$\" -gg!", "priority": 10, "action": "./bin/run.sh", "params": "minute", "exitmenu": false, "refresh": true},
         {
           "name": "RTC deep-sleep rotation",
           "items": [
-            {"name": "Every 5 minutes (test)", "action": "./bin/run.sh", "params": "rtc300", "exitmenu": false, "refresh": true},
-            {"name": "Every 15 minutes", "action": "./bin/run.sh", "params": "rtc900", "exitmenu": false, "refresh": true},
-            {"name": "Every 30 minutes", "action": "./bin/run.sh", "params": "rtc1800", "exitmenu": false, "refresh": true},
-            {"name": "Every hour", "action": "./bin/run.sh", "params": "rtc3600", "exitmenu": false, "refresh": true},
-            {"name": "Every day", "action": "./bin/run.sh", "params": "rtc86400", "exitmenu": false, "refresh": true}
+            {"name": "✓ Every 5 minutes (test)", "if": "\"/mnt/us/photo-frame/config\" \"^mode=rtc$\" -gg \"/mnt/us/photo-frame/config\" \"^interval=300$\" -gg &&", "priority": 10, "action": "./bin/run.sh", "params": "rtc300", "exitmenu": false, "refresh": true},
+            {"name": "Every 5 minutes (test)", "if": "\"/mnt/us/photo-frame/config\" \"^mode=rtc$\" -gg! \"/mnt/us/photo-frame/config\" \"^interval=300$\" -gg! ||", "priority": 10, "action": "./bin/run.sh", "params": "rtc300", "exitmenu": false, "refresh": true},
+            {"name": "✓ Every 15 minutes", "if": "\"/mnt/us/photo-frame/config\" \"^mode=rtc$\" -gg \"/mnt/us/photo-frame/config\" \"^interval=900$\" -gg &&", "priority": 20, "action": "./bin/run.sh", "params": "rtc900", "exitmenu": false, "refresh": true},
+            {"name": "Every 15 minutes", "if": "\"/mnt/us/photo-frame/config\" \"^mode=rtc$\" -gg! \"/mnt/us/photo-frame/config\" \"^interval=900$\" -gg! ||", "priority": 20, "action": "./bin/run.sh", "params": "rtc900", "exitmenu": false, "refresh": true},
+            {"name": "✓ Every 30 minutes", "if": "\"/mnt/us/photo-frame/config\" \"^mode=rtc$\" -gg \"/mnt/us/photo-frame/config\" \"^interval=1800$\" -gg &&", "priority": 30, "action": "./bin/run.sh", "params": "rtc1800", "exitmenu": false, "refresh": true},
+            {"name": "Every 30 minutes", "if": "\"/mnt/us/photo-frame/config\" \"^mode=rtc$\" -gg! \"/mnt/us/photo-frame/config\" \"^interval=1800$\" -gg! ||", "priority": 30, "action": "./bin/run.sh", "params": "rtc1800", "exitmenu": false, "refresh": true},
+            {"name": "✓ Every hour", "if": "\"/mnt/us/photo-frame/config\" \"^mode=rtc$\" -gg \"/mnt/us/photo-frame/config\" \"^interval=3600$\" -gg &&", "priority": 40, "action": "./bin/run.sh", "params": "rtc3600", "exitmenu": false, "refresh": true},
+            {"name": "Every hour", "if": "\"/mnt/us/photo-frame/config\" \"^mode=rtc$\" -gg! \"/mnt/us/photo-frame/config\" \"^interval=3600$\" -gg! ||", "priority": 40, "action": "./bin/run.sh", "params": "rtc3600", "exitmenu": false, "refresh": true},
+            {"name": "✓ Every day", "if": "\"/mnt/us/photo-frame/config\" \"^mode=rtc$\" -gg \"/mnt/us/photo-frame/config\" \"^interval=86400$\" -gg &&", "priority": 50, "action": "./bin/run.sh", "params": "rtc86400", "exitmenu": false, "refresh": true},
+            {"name": "Every day", "if": "\"/mnt/us/photo-frame/config\" \"^mode=rtc$\" -gg! \"/mnt/us/photo-frame/config\" \"^interval=86400$\" -gg! ||", "priority": 50, "action": "./bin/run.sh", "params": "rtc86400", "exitmenu": false, "refresh": true}
           ]
         },
-        {"name": "Use hourly rotation", "action": "./bin/run.sh", "params": "hourly", "exitmenu": false, "refresh": true},
-        {"name": "Use daily rotation", "action": "./bin/run.sh", "params": "daily", "exitmenu": false, "refresh": true},
+        {"name": "✓ Use hourly rotation", "if": "\"/mnt/us/photo-frame/config\" \"^mode=hourly$\" -gg", "priority": 20, "action": "./bin/run.sh", "params": "hourly", "exitmenu": false, "refresh": true},
+        {"name": "Use hourly rotation", "if": "\"/mnt/us/photo-frame/config\" \"^mode=hourly$\" -gg!", "priority": 20, "action": "./bin/run.sh", "params": "hourly", "exitmenu": false, "refresh": true},
+        {"name": "✓ Use daily rotation", "if": "\"/mnt/us/photo-frame/config\" \"^mode=daily$\" -gg", "priority": 30, "action": "./bin/run.sh", "params": "daily", "exitmenu": false, "refresh": true},
+        {"name": "Use daily rotation", "if": "\"/mnt/us/photo-frame/config\" \"^mode=daily$\" -gg!", "priority": 30, "action": "./bin/run.sh", "params": "daily", "exitmenu": false, "refresh": true},
         {"name": "Show status", "action": "./bin/run.sh", "params": "status", "exitmenu": false, "refresh": true},
         {"name": "Uninstall / restore screensavers", "action": "./bin/run.sh", "params": "uninstall", "exitmenu": false, "refresh": true}
       ]
