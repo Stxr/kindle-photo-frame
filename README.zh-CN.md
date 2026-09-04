@@ -110,6 +110,34 @@ python3 host/photo_frame.py push --host "$KINDLE_HOST" /path/to/photo-folder
 
 处理后的文件名包含校验值，未变化的照片会直接复用。运行时照片位于 `/mnt/us/photo-frame/`，不会被仓库跟踪。
 
+## 为照片添加一句文案
+
+项目提供了一套受 InkTime 启发、重新编写的[中文锁屏文案提示词](prompts/caption.zh-CN.md)：强调不复述画面、不虚构背景，以克制幽默或含蓄观察写一句 8～24 字的旁白。
+
+将视觉模型生成或自己写好的文案保存为 JSON：
+
+```json
+[
+  {
+    "image": "photos/example.jpg",
+    "caption": "今天的会议，主要讨论罐头怎么开",
+    "subtitle": "可选的小字信息"
+  }
+]
+```
+
+安装可选的排版依赖并生成 1072×1448 Kindle 成品图：
+
+```sh
+python3 -m pip install -r requirements-caption.txt
+python3 host/render_captions.py captions.json \
+  --font /path/to/chinese-font.otf \
+  --output photos/rendered
+python3 host/photo_frame.py push --host "$KINDLE_HOST" photos/rendered
+```
+
+排版脚本会给照片底部保留白色文字区，文案最多两行，并输出 256 级灰度 PNG。字体须由用户自行提供；推荐使用许可允许的中文字体，如 Noto Sans CJK。
+
 ## 切换模式
 
 ### 每小时或每天
@@ -209,6 +237,8 @@ ssh "$KINDLE_HOST" 'rm -rf /mnt/us/extensions/photo-frame'
 device/                     Kindle 端 POSIX Shell 脚本
 extension/photo-frame/      KUAL 扩展
 host/photo_frame.py         SSH/SFTP 部署和批量上传工具
+host/render_captions.py     文案版锁屏图片排版工具
+prompts/                    可复用的文案提示词
 tests/                      标准库单元测试
 ```
 
@@ -229,4 +259,4 @@ python3 -m unittest discover -s tests -v
 
 ## 许可证与致谢
 
-项目采用 [MIT 许可证](LICENSE)。感谢 NiLuJe、MobileRead、[FBInk](https://github.com/NiLuJe/FBInk) 和 [KOReader](https://github.com/koreader/koreader) 社区提供的 Kindle 工具与电源管理实践。
+项目采用 [MIT 许可证](LICENSE)。感谢 [InkTime](https://github.com/dai-hongtao/InkTime) 提供“回忆相框 + 短旁白”的产品灵感；本项目面向 Kindle 独立编写提示词与排版器。也感谢 NiLuJe、MobileRead、[FBInk](https://github.com/NiLuJe/FBInk) 和 [KOReader](https://github.com/koreader/koreader) 社区提供的 Kindle 工具与电源管理实践。

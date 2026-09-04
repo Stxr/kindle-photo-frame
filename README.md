@@ -139,6 +139,24 @@ python3 host/photo_frame.py push --host "$KINDLE_HOST" ~/Pictures/KindleAlbum
 Runtime photos stay under `/mnt/us/photo-frame/`; the repository does not track
 them.
 
+## Captioned photos
+
+The project includes an original Chinese [lock-screen caption prompt](prompts/caption.zh-CN.md), inspired by InkTime's idea of adding a short thought rather than merely describing the image. You may use its output—or your own copy—in a JSON manifest:
+
+```json
+[{"image":"photos/example.jpg","caption":"今天的会议，主要讨论罐头怎么开","subtitle":"optional"}]
+```
+
+Render Kindle-ready captioned images and upload them:
+
+```sh
+python3 -m pip install -r requirements-caption.txt
+python3 host/render_captions.py captions.json --font /path/to/chinese-font.otf --output photos/rendered
+python3 host/photo_frame.py push --host "$KINDLE_HOST" photos/rendered
+```
+
+The optional renderer creates 1072×1448, 256-level grayscale PNG files with a white caption area. Supply a properly licensed Chinese TTF/OTF font, such as Noto Sans CJK.
+
 ## Rotation modes
 
 ### Hourly or daily
@@ -257,6 +275,8 @@ diagnose via root SSH. Do not make `/dev/fb0` permanently world-writable.
 device/                     Kindle-side POSIX shell scripts
 extension/photo-frame/      KUAL extension
 host/photo_frame.py         SSH/SFTP deployment and batch upload CLI
+host/render_captions.py     Captioned lock-screen image renderer
+prompts/                    Reusable writing prompts
 tests/                      standard-library unit tests
 ```
 
@@ -282,6 +302,7 @@ endings and avoid Bash-only syntax.
 
 ## Acknowledgements
 
+- [InkTime](https://github.com/dai-hongtao/InkTime) for the memory-frame and short-caption concept; this project's prompt and renderer are independently written for Kindle.
 - NiLuJe and MobileRead for Kindle jailbreak tooling and `linkss`.
 - [FBInk](https://github.com/NiLuJe/FBInk) for E Ink rendering.
 - [KOReader](https://github.com/koreader/koreader) for Kindle power-event work.
