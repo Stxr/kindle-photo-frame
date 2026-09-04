@@ -13,7 +13,12 @@ if [ -f "$PID_FILE" ]; then
 fi
 
 echo $$ > "$PID_FILE"
-trap 'rm -f "$PID_FILE"; exit 0' EXIT HUP INT TERM
+cleanup() {
+    owner=""
+    [ -f "$PID_FILE" ] && owner=$(cat "$PID_FILE" 2>/dev/null)
+    [ "$owner" = "$$" ] && rm -f "$PID_FILE"
+}
+trap 'cleanup; exit 0' EXIT HUP INT TERM
 log "watcher started pid=$$"
 
 last_event=""
@@ -53,7 +58,17 @@ while :; do
     fi
     before_slot=""
     [ -f "$STATE_DIR/slot" ] && before_slot=$(cat "$STATE_DIR/slot")
-    "$SCRIPT_DIR/pick.sh" >/dev/null 2>&1 || true
+    case "$last_event:$mode" in
+        *wakeupFromSuspend*:rtc|*wakeupFromSuspend*:rtc5)
+            # Advance from the actual current file instead of deriving the
+            # image from wall-clock time. This guarantees A -> B -> C -> A
+            # even when an RTC wake is delayed across more than one slot.
+            "$SCRIPT_DIR/next.sh" >/dev/null 2>&1 || true
+            ;;
+        *)
+            "$SCRIPT_DIR/pick.sh" >/dev/null 2>&1 || true
+            ;;
+    esac
     after_slot=""
     [ -f "$STATE_DIR/slot" ] && after_slot=$(cat "$STATE_DIR/slot")
 

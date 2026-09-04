@@ -1,5 +1,7 @@
 # Kindle Photo Frame
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 Turn a jailbroken Kindle into a low-power lock-screen photo frame. Photos are
 prepared on the device, displayed through Kindle's native screensaver flow, and
 rotated on wake, by time slot, or by an RTC alarm that can wake from suspend.
@@ -51,7 +53,7 @@ computer photos
       │  auto-orient → crop → grayscale → PNG8
       ▼
 /mnt/us/photo-frame/prepared
-      │  deterministic time-slot selection
+      │  time-slot selection / sequential RTC rotation
       ▼
 /mnt/us/linkss/screensavers/bg_ss00.png
       │
@@ -66,7 +68,8 @@ powerd: readyToSuspend → schedule rtcWakeup
 `linkss` reads the active image when Kindle enters its screensaver. The watcher
 also listens for `readyToSuspend` and `wakeupFromSuspend`. In RTC mode it sets an
 alarm only inside the short state window accepted by powerd. When the alarm
-fires, the process resumes, selects the new slot, redraws, and suspends again.
+fires, the process resumes, advances exactly one photo (wrapping at the end),
+redraws, and suspends again.
 
 ## Prerequisites
 

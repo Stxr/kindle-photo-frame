@@ -9,6 +9,7 @@ import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 PICKER = ROOT / "device" / "pick.sh"
+NEXT = ROOT / "device" / "next.sh"
 SET_MODE = ROOT / "device" / "set-mode.sh"
 
 
@@ -82,6 +83,27 @@ class PickerTests(unittest.TestCase):
         result = self.run_script(PICKER, epoch=900 * 4)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual((self.linkss / "bg_ss00.png").read_bytes(), b"B")
+
+    def test_rtc_advance_cycles_from_current_image(self) -> None:
+        self.add_photos()
+        config = pathlib.Path(self.env["PHOTO_FRAME_CONFIG"])
+        config.write_text("mode=rtc\ninterval=300\n")
+        self.state.mkdir()
+        (self.state / "current").write_text("a.png\n")
+
+        expected = ((b"B", "b.png"), (b"C", "c.png"), (b"A", "a.png"))
+        for sequence, (contents, name) in enumerate(expected, start=1):
+            result = self.run_script(NEXT)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual((self.linkss / "bg_ss00.png").read_bytes(), contents)
+            self.assertEqual((self.state / "current").read_text().strip(), name)
+            self.assertEqual((self.state / "sequence").read_text().strip(), str(sequence))
+
+    def test_rtc_advance_starts_at_first_image_when_current_is_unknown(self) -> None:
+        self.add_photos()
+        result = self.run_script(NEXT)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual((self.linkss / "bg_ss00.png").read_bytes(), b"A")
 
     def test_same_slot_does_not_rewrite_active_image(self) -> None:
         self.add_photos()
