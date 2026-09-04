@@ -11,6 +11,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 PICKER = ROOT / "device" / "pick.sh"
 NEXT = ROOT / "device" / "next.sh"
 SET_MODE = ROOT / "device" / "set-mode.sh"
+WATCHER = ROOT / "device" / "watch.sh"
 
 
 class PickerTests(unittest.TestCase):
@@ -104,6 +105,12 @@ class PickerTests(unittest.TestCase):
         result = self.run_script(NEXT)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual((self.linkss / "bg_ss00.png").read_bytes(), b"A")
+
+    def test_rtc_timeout_has_an_explicit_noop_branch(self) -> None:
+        script = WATCHER.read_text()
+        noop = script.index("*:rtc|*:rtc5)")
+        fallback = script.index("*)\n            \"$SCRIPT_DIR/pick.sh\"", noop)
+        self.assertNotIn('"$SCRIPT_DIR/pick.sh"', script[noop:fallback])
 
     def test_same_slot_does_not_rewrite_active_image(self) -> None:
         self.add_photos()

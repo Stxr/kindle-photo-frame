@@ -65,6 +65,11 @@ while :; do
             # even when an RTC wake is delayed across more than one slot.
             "$SCRIPT_DIR/next.sh" >/dev/null 2>&1 || true
             ;;
+        *:rtc|*:rtc5)
+            # RTC modes advance only on a real resume event. Calling pick.sh
+            # from the ordinary timeout path would re-apply wall-clock slot
+            # selection and could overwrite the sequential choice.
+            ;;
         *)
             "$SCRIPT_DIR/pick.sh" >/dev/null 2>&1 || true
             ;;
