@@ -163,7 +163,7 @@ ssh "$KINDLE_HOST" /mnt/us/photo-frame/bin/set-mode.sh minute
 
 RTC 模式允许 CPU 正常休眠。到达间隔后，powerd 唤醒 Kindle，监听器推进并刷新下一张照片，再在下次休眠前预约闹钟。
 
-KUAL → **Photo Frame → RTC deep-sleep rotation** 提供：
+KUAL → **Photo Frame → Auto-wake rotation interval** 将换图周期与 RTC 自动唤醒绑定，并提供：
 
 - 5 分钟（测试）；
 - 15 分钟；
@@ -181,7 +181,7 @@ ssh "$KINDLE_HOST" /mnt/us/photo-frame/bin/set-rtc.sh 300
 
 ## KUAL 菜单与状态
 
-**Photo Frame** 菜单包含安装/修复、导入、立即刷新、分钟/小时/每天模式、RTC 预设、状态和卸载恢复。
+**Photo Frame** 菜单包含安装/修复、导入、立即刷新、分钟测试、自动唤醒换图周期、状态和卸载恢复。普通的每小时/每天非唤醒模式仅为兼容旧配置而保留在 SSH 命令中，不再作为 KUAL 菜单选项。
 
 ```sh
 python3 host/photo_frame.py status --host "$KINDLE_HOST"

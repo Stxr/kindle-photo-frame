@@ -188,7 +188,8 @@ RTC mode lets the CPU suspend. Powerd wakes Kindle after the chosen interval,
 the watcher redraws the next photo, and another alarm is scheduled before the
 next suspend.
 
-KUAL → **Photo Frame → RTC deep-sleep rotation** offers:
+KUAL → **Photo Frame → Auto-wake rotation interval** binds the rotation interval
+to an RTC wake and offers:
 
 - 5 minutes (test);
 - 15 minutes;
@@ -210,8 +211,9 @@ are better for normal use.
 
 ## KUAL menu and status
 
-The **Photo Frame** menu contains install/repair, import, refresh, minute/hourly/
-daily modes, RTC presets, status, and uninstall/restore.
+The **Photo Frame** menu contains install/repair, import, refresh, minute test
+mode, auto-wake rotation presets, status, and uninstall/restore. Hourly and
+daily non-waking modes remain available over SSH for backward compatibility.
 
 ```sh
 python3 host/photo_frame.py status --host "$KINDLE_HOST"
