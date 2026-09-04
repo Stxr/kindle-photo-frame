@@ -17,7 +17,41 @@ trap 'rm -f "$PID_FILE"; exit 0' EXIT HUP INT TERM
 log "watcher started pid=$$"
 
 while :; do
+    if [ "$(read_mode)" = "minute" ]; then
+        # powerd accepts these delays in different phases: suspendGrace before
+        # readyToSuspend, then deferSuspend once that transition has happened.
+        # Reverting to hourly/daily or uninstalling restores normal suspend.
+        power_state=$(lipc-get-prop com.lab126.powerd state 2>/dev/null || true)
+        case "$power_state" in
+            readyToSuspend)
+                lipc-set-prop -i com.lab126.powerd deferSuspend 120 >/dev/null 2>&1 || true
+                ;;
+            active|screenSaver)
+                lipc-set-prop -i com.lab126.powerd suspendGrace 120 >/dev/null 2>&1 || true
+                ;;
+        esac
+    fi
+    before_slot=""
+    [ -f "$STATE_DIR/slot" ] && before_slot=$(cat "$STATE_DIR/slot")
     "$SCRIPT_DIR/pick.sh" >/dev/null 2>&1 || true
+    after_slot=""
+    [ -f "$STATE_DIR/slot" ] && after_slot=$(cat "$STATE_DIR/slot")
+
+    # Minute mode is a visual test mode: linkss only reads a new file while
+    # entering screensaver, so explicitly redraw if the selected minute changed
+    # while the Kindle is still in its screenSaver state.
+    if [ "$(read_mode)" = "minute" ] && [ -n "$after_slot" ] && \
+        [ "$after_slot" != "$before_slot" ]; then
+        state=$(lipc-get-prop com.lab126.powerd state 2>/dev/null || true)
+        case "$state" in
+            screenSaver|readyToSuspend)
+                if [ -f "$ACTIVE_IMAGE" ]; then
+                    /usr/bin/fbink -q -c -i "$ACTIVE_IMAGE" -W GC16 -w >/dev/null 2>&1 || true
+                    log "redrew locked screen for minute slot=$after_slot state=$state"
+                fi
+                ;;
+        esac
+    fi
     # A timeout keeps the selected time slot current while the device is awake.
     # During deep sleep this process is frozen and consumes no CPU.
     lipc-wait-event -s 15 com.lab126.powerd \

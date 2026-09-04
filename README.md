@@ -55,8 +55,14 @@ battery; that is deliberately outside this first version.
 
 The minute mode is intended for validation. While the Kindle is awake, the
 watcher updates the prepared lock-screen file within roughly 15 seconds of a
-minute boundary. To see each change with normal low-power behavior, wake and
-lock the Kindle again; deep sleep itself does not run a reliable per-minute job.
+minute boundary. While powerd remains in its `screenSaver` state, minute mode
+also performs an explicit GC16 redraw so the change is visible without an
+unlock. It uses `suspendGrace` in the lock-screen phase and renews
+`deferSuspend` after powerd reaches `readyToSuspend`, preventing deep suspend so
+the test can continue cycling. This uses materially more battery
+and is not intended as the normal low-power mode. Switching to hourly/daily or
+uninstalling resets the grace value to zero. A reliable long-interval refresh
+from deep suspend requires a separate RTC timed-wake mechanism.
 
 ## Batch photo preparation
 

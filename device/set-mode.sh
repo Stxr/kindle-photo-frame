@@ -15,6 +15,16 @@ printf 'mode=%s\n' "$mode" > "$tmp"
 mv -f "$tmp" "$CONFIG_FILE"
 log "mode changed to $mode"
 
+if command -v lipc-set-prop >/dev/null 2>&1; then
+    if [ "$mode" = "minute" ]; then
+        # Test mode keeps powerd in the lock-screen grace period so the watcher
+        # can redraw. The watcher renews this while minute mode remains active.
+        lipc-set-prop -i com.lab126.powerd suspendGrace 120 >/dev/null 2>&1 || true
+    else
+        lipc-set-prop -i com.lab126.powerd suspendGrace 0 >/dev/null 2>&1 || true
+    fi
+fi
+
 set +e
 "$SCRIPT_DIR/pick.sh"
 rc=$?

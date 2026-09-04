@@ -29,6 +29,7 @@ class PickerTests(unittest.TestCase):
             "PHOTO_FRAME_ACTIVE": str(self.linkss / "bg_ss00.png"),
             "PHOTO_FRAME_CONFIG": str(base / "config"),
             "PHOTO_FRAME_LOG": str(base / "test.log"),
+            "PATH": "/usr/bin:/bin",
         }
 
     def tearDown(self) -> None:
