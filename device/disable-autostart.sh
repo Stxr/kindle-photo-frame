@@ -15,7 +15,12 @@ fi
 
 if [ -f "$STATE_DIR/watch.pid" ]; then
     pid=$(cat "$STATE_DIR/watch.pid" 2>/dev/null)
-    [ -n "$pid" ] && kill "$pid" 2>/dev/null || true
+    cmdline=""
+    if [ -n "$pid" ] && [ -r "/proc/$pid/cmdline" ]; then
+        cmdline=$(tr '\000' ' ' < "/proc/$pid/cmdline")
+    fi
+    case "$cmdline" in
+        *"/mnt/us/photo-frame/bin/watch.sh"*) kill "$pid" 2>/dev/null || true ;;
+    esac
     rm -f "$STATE_DIR/watch.pid"
 fi
-
