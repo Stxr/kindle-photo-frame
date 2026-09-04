@@ -97,7 +97,7 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers(dest="command", required=True)
     for name in ("deploy", "status"):
         child = subparsers.add_parser(name)
-        child.add_argument("--host", required=True, help="SSH target, e.g. root@192.168.1.12")
+        child.add_argument("--host", required=True, help="SSH target, e.g. root@KINDLE_IP")
     child = subparsers.add_parser("push")
     child.add_argument("--host", required=True)
     child.add_argument("photos", nargs="+", type=pathlib.Path, help="photo files or directories")
