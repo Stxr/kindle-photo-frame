@@ -1,0 +1,18 @@
+{
+  "items": [
+    {
+      "name": "Photo Frame",
+      "priority": 30,
+      "items": [
+        {"name": "Install / repair", "action": "./bin/run.sh", "params": "install", "exitmenu": false, "refresh": true},
+        {"name": "Import photos now", "action": "./bin/run.sh", "params": "import", "exitmenu": false, "refresh": true},
+        {"name": "Refresh current photo", "action": "./bin/run.sh", "params": "pick", "exitmenu": false, "refresh": true},
+        {"name": "Use hourly rotation", "action": "./bin/run.sh", "params": "hourly", "exitmenu": false, "refresh": true},
+        {"name": "Use daily rotation", "action": "./bin/run.sh", "params": "daily", "exitmenu": false, "refresh": true},
+        {"name": "Show status", "action": "./bin/run.sh", "params": "status", "exitmenu": false, "refresh": true},
+        {"name": "Uninstall / restore screensavers", "action": "./bin/run.sh", "params": "uninstall", "exitmenu": false, "refresh": true}
+      ]
+    }
+  ]
+}
+
