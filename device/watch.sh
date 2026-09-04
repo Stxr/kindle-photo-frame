@@ -16,8 +16,28 @@ echo $$ > "$PID_FILE"
 trap 'rm -f "$PID_FILE"; exit 0' EXIT HUP INT TERM
 log "watcher started pid=$$"
 
+last_event=""
 while :; do
-    if [ "$(read_mode)" = "minute" ]; then
+    mode=$(read_mode)
+
+    # rtcWakeup is only accepted during powerd's readyToSuspend window.
+    case "$last_event" in
+        *readyToSuspend*)
+            if [ "$mode" = "rtc5" ] || [ "$mode" = "rtc" ]; then
+                interval=$(read_interval)
+                if [ "$mode" = "rtc5" ]; then interval=300; fi
+                if lipc-set-prop -i com.lab126.powerd rtcWakeup "$interval" >/dev/null 2>&1; then
+                    next_wakeup=$(($(date +%s) + interval))
+                    printf '%s\n' "$next_wakeup" > "$STATE_DIR/next-wakeup"
+                    log "scheduled RTC wake in $interval seconds epoch=$next_wakeup"
+                else
+                    log "failed to schedule RTC wake"
+                fi
+            fi
+            ;;
+    esac
+
+    if [ "$mode" = "minute" ]; then
         # powerd accepts these delays in different phases: suspendGrace before
         # readyToSuspend, then deferSuspend once that transition has happened.
         # Reverting to hourly/daily or uninstalling restores normal suspend.
@@ -40,20 +60,23 @@ while :; do
     # Minute mode is a visual test mode: linkss only reads a new file while
     # entering screensaver, so explicitly redraw if the selected minute changed
     # while the Kindle is still in its screenSaver state.
-    if [ "$(read_mode)" = "minute" ] && [ -n "$after_slot" ] && \
+    if { [ "$mode" = "minute" ] || [ "$mode" = "rtc5" ] || [ "$mode" = "rtc" ]; } && \
+        [ -n "$after_slot" ] && \
         [ "$after_slot" != "$before_slot" ]; then
         state=$(lipc-get-prop com.lab126.powerd state 2>/dev/null || true)
         case "$state" in
             screenSaver|readyToSuspend)
                 if [ -f "$ACTIVE_IMAGE" ]; then
                     /usr/bin/fbink -q -c -i "$ACTIVE_IMAGE" -W GC16 -w >/dev/null 2>&1 || true
-                    log "redrew locked screen for minute slot=$after_slot state=$state"
+                    log "redrew locked screen mode=$mode slot=$after_slot state=$state"
                 fi
                 ;;
         esac
     fi
     # A timeout keeps the selected time slot current while the device is awake.
     # During deep sleep this process is frozen and consumes no CPU.
-    lipc-wait-event -s 15 com.lab126.powerd \
-        goingToScreenSaver,outOfScreenSaver >/dev/null 2>&1 || true
+    last_event=$(lipc-wait-event -s 15 com.lab126.powerd \
+        goingToScreenSaver,outOfScreenSaver,readyToSuspend,wakeupFromSuspend \
+        2>/dev/null || true)
+    [ -n "$last_event" ] && log "power event: $last_event"
 done

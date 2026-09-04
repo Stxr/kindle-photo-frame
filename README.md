@@ -12,7 +12,7 @@ E Ink keeps the displayed image without a foreground app continuously running.
 
 - local JPEG/PNG photo inbox;
 - center-crop and grayscale conversion on the Kindle;
-- deterministic minute (test), hourly, or daily rotation;
+- deterministic minute (test), RTC five-minute (test), hourly, or daily rotation;
 - atomic replacement of the `linkss` screensaver;
 - SFTP deployment from a computer;
 - backup and uninstall path for the pre-existing screensaver set;
@@ -31,7 +31,7 @@ python3 host/photo_frame.py push --host root@KINDLE_IP /path/to/a/photo-folder
 ```
 
 On the Kindle, open KUAL → **Photo Frame** → **Install / repair**, then choose
-minute, hourly, or daily mode. The current image is selected immediately. Subsequent
+minute, configurable RTC, hourly, or daily mode. The current image is selected immediately. Subsequent
 photo imports refresh it automatically.
 
 Installation adds a clearly marked autostart stanza to the existing user-storage
@@ -63,6 +63,19 @@ the test can continue cycling. This uses materially more battery
 and is not intended as the normal low-power mode. Switching to hourly/daily or
 uninstalling resets the grace value to zero. A reliable long-interval refresh
 from deep suspend requires a separate RTC timed-wake mechanism.
+
+RTC five-minute test mode uses powerd's `rtcWakeup` property only during the
+short `readyToSuspend` window. The Kindle then enters normal suspend, wakes five
+minutes later, selects and redraws the next photo, schedules the next alarm when
+it is ready to suspend again, and repeats. It is designed to validate the same
+architecture that can later use hourly or daily intervals.
+
+KUAL includes RTC presets for 5, 15, 30, and 60 minutes, plus one day. For a
+custom value between 60 and 86400 seconds, run:
+
+```sh
+/mnt/us/photo-frame/bin/set-rtc.sh SECONDS
+```
 
 ## Batch photo preparation
 

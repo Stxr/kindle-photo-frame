@@ -8,6 +8,16 @@
         {"name": "Import photos now", "action": "./bin/run.sh", "params": "import", "exitmenu": false, "refresh": true},
         {"name": "Refresh current photo", "action": "./bin/run.sh", "params": "pick", "exitmenu": false, "refresh": true},
         {"name": "Use minute rotation (test)", "action": "./bin/run.sh", "params": "minute", "exitmenu": false, "refresh": true},
+        {
+          "name": "RTC deep-sleep rotation",
+          "items": [
+            {"name": "Every 5 minutes (test)", "action": "./bin/run.sh", "params": "rtc300", "exitmenu": false, "refresh": true},
+            {"name": "Every 15 minutes", "action": "./bin/run.sh", "params": "rtc900", "exitmenu": false, "refresh": true},
+            {"name": "Every 30 minutes", "action": "./bin/run.sh", "params": "rtc1800", "exitmenu": false, "refresh": true},
+            {"name": "Every hour", "action": "./bin/run.sh", "params": "rtc3600", "exitmenu": false, "refresh": true},
+            {"name": "Every day", "action": "./bin/run.sh", "params": "rtc86400", "exitmenu": false, "refresh": true}
+          ]
+        },
         {"name": "Use hourly rotation", "action": "./bin/run.sh", "params": "hourly", "exitmenu": false, "refresh": true},
         {"name": "Use daily rotation", "action": "./bin/run.sh", "params": "daily", "exitmenu": false, "refresh": true},
         {"name": "Show status", "action": "./bin/run.sh", "params": "status", "exitmenu": false, "refresh": true},

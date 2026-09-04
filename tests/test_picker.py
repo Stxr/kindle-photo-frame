@@ -66,6 +66,23 @@ class PickerTests(unittest.TestCase):
         self.assertEqual((self.linkss / "bg_ss00.png").read_bytes(), b"B")
         self.assertEqual((self.state / "mode").read_text(), "minute\n")
 
+    def test_rtc_five_minute_rotation(self) -> None:
+        self.add_photos()
+        result = self.run_script(SET_MODE, "rtc5", epoch=300 * 8)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual((self.linkss / "bg_ss00.png").read_bytes(), b"C")
+        result = self.run_script(PICKER, epoch=300 * 9)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual((self.linkss / "bg_ss00.png").read_bytes(), b"A")
+
+    def test_configurable_rtc_rotation(self) -> None:
+        self.add_photos()
+        config = pathlib.Path(self.env["PHOTO_FRAME_CONFIG"])
+        config.write_text("mode=rtc\ninterval=900\n")
+        result = self.run_script(PICKER, epoch=900 * 4)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual((self.linkss / "bg_ss00.png").read_bytes(), b"B")
+
     def test_same_slot_does_not_rewrite_active_image(self) -> None:
         self.add_photos()
         first = self.run_script(SET_MODE, "minute", epoch=60 * 7)

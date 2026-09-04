@@ -20,10 +20,22 @@ read_mode() {
     if [ -f "$CONFIG_FILE" ]; then
         configured=$(sed -n 's/^mode=//p' "$CONFIG_FILE" | head -n 1)
         case "$configured" in
-        minute|hourly|daily) mode="$configured" ;;
+        minute|rtc|rtc5|hourly|daily) mode="$configured" ;;
         esac
     fi
     printf '%s\n' "$mode"
+}
+
+read_interval() {
+    interval="300"
+    if [ -f "$CONFIG_FILE" ]; then
+        configured=$(sed -n 's/^interval=//p' "$CONFIG_FILE" | head -n 1)
+        case "$configured" in
+            ''|*[!0-9]*) ;;
+            *) [ "$configured" -ge 60 ] 2>/dev/null && interval="$configured" ;;
+        esac
+    fi
+    printf '%s\n' "$interval"
 }
 
 ensure_dirs() {

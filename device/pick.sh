@@ -18,6 +18,8 @@ count=$#
 epoch="${PHOTO_FRAME_EPOCH:-$(date +%s)}"
 case "$mode" in
     minute) slot=$((epoch / 60)) ;;
+    rtc5) slot=$((epoch / 300)) ;;
+    rtc) slot=$((epoch / $(read_interval))) ;;
     hourly) slot=$((epoch / 3600)) ;;
     daily) slot=$((epoch / 86400)) ;;
     *) echo "Invalid mode: $mode" >&2; exit 3 ;;
